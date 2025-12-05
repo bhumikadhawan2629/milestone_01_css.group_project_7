@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Volunteer Hours Tracker</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="js/volunteer.js" defer></script>
+</head>
+<body>
+ 
+<header>
+<h1>Volunteer Hours Tracker</h1>
+</header>
+ 
+<nav id="navbar">
+<ul>
+<li><a href="donation.html">Donation Tracker</a></li>
+<li><a class="active" href="volunteer.html">Volunteer Tracker</a></li>
+</ul>
+</nav>
+ 
+<main>
+<section>
+<h2>Log Volunteer Hours</h2>
+ 
+        <form id="volunteerForm">
+ 
+            <label>Charity / Organization:</label>
+<input type="text" id="charityName">
+ 
+            <label>Hours Volunteered:</label>
+<input type="number" id="hoursVolunteered">
+ 
+            <label>Date:</label>
+<input type="date" id="volunteerDate">
+ 
+            <label>Experience Rating (1-5):</label>
+<input type="number" id="experienceRating" min="1" max="5">
+ 
+            <button type="submit">Add Log</button>
+</form>
+ 
+        <div id="errorMessage" class="error"></div>
+</section>
+</main>
+ 
+<footer>
+<p>© 2025 PiXELL River Financial</p>
+</footer>
+ 
+</body>
+</html>
