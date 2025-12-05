@@ -1,46 +1,85 @@
-// this will run after the HTML is loaded
 document.addEventListener("DOMContentLoaded", () => {
-    const form = document.getElementById("donationForm");
+    loadDonations();
 
-    form.addEventListener("submit", (event) => {
-        event.preventDefault(); // stop normal form submit (no page reload)
-
-        // 1. get values from form inputs
-        const charity = document.getElementById("charityName").value.trim();
-        const amount = document.getElementById("donationAmount").value.trim();
-        const date = document.getElementById("donationDate").value;
-        const comment = document.getElementById("donorComment").value.trim();
-        const errorDiv = document.getElementById("errorMessage");
-
-        // 2. validate
-        if (!charity || !amount || !date || !comment) {
-            errorDiv.textContent = "Please fill in all fields.";
-            return;
-        }
-
-        const amountNumber = Number(amount);
-        if (isNaN(amountNumber) || amountNumber <= 0) {
-            errorDiv.textContent = "Donation amount must be a positive number.";
-            return;
-        }
-
-        // if we reach here, data is valid
-        errorDiv.textContent = "";
-
-        // 3. create a temporary data object
-        const donation = {
-            charity: charity,
-            amount: amountNumber,
-            date: date,
-            comment: comment
-        };
-
-        console.log("Temporary donation object:", donation);
-
-        // 4. for now, just show a simple message
-        alert("Donation saved (temporary only).");
-
-        // 5. clear the form
-        form.reset();
+    document.getElementById("donationForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        handleDonationSubmit();
     });
 });
+
+// ---------- VALIDATION ----------
+function validateDonation(charity, amount, date, comment) {
+    if (!charity || !amount || !date || !comment) return false;
+    if (isNaN(amount) || amount <= 0) return false;
+    return true;
+}
+
+// ---------- SUBMIT ----------
+function handleDonationSubmit() {
+    let charity = document.getElementById("charityName").value.trim();
+    let amount = Number(document.getElementById("donationAmount").value);
+    let date = document.getElementById("donationDate").value;
+    let comment = document.getElementById("donorComment").value.trim();
+
+    if (!validateDonation(charity, amount, date, comment)) {
+        document.getElementById("errorMessage").innerText =
+            "Please fill all fields correctly.";
+        return;
+    }
+
+    document.getElementById("errorMessage").innerText = "";
+
+    let donation = { charity, amount, date, comment };
+
+    saveDonation(donation);
+    loadDonations();
+
+    alert("Donation saved!");
+    document.getElementById("donationForm").reset();
+}
+
+// ---------- SAVE ----------
+function saveDonation(donation) {
+    let donations = JSON.parse(localStorage.getItem("donations")) || [];
+    donations.push(donation);
+    localStorage.setItem("donations", JSON.stringify(donations));
+}
+
+// ---------- LOAD ----------
+function loadDonations() {
+    let donations = JSON.parse(localStorage.getItem("donations")) || [];
+    let tableBody = document.querySelector("#donationTable tbody");
+    tableBody.innerHTML = "";
+
+    donations.forEach((d, index) => {
+        let row = `
+        <tr>
+            <td>${d.charity}</td>
+            <td>$${d.amount}</td>
+            <td>${d.date}</td>
+            <td>${d.comment}</td>
+            <td><button onclick="deleteDonation(${index})">X</button></td>
+        </tr>`;
+        tableBody.innerHTML += row;
+    });
+
+    updateTotal();
+}
+
+// ---------- DELETE ----------
+function deleteDonation(index) {
+    let donations = JSON.parse(localStorage.getItem("donations")) || [];
+    donations.splice(index, 1);
+    localStorage.setItem("donations", JSON.stringify(donations));
+    loadDonations();
+}
+
+// ---------- TOTAL ----------
+function updateTotal() {
+    let donations = JSON.parse(localStorage.getItem("donations")) || [];
+    let total = donations.reduce((sum, d) => sum + d.amount, 0);
+    document.getElementById("totalDonation").innerText =
+        `Total Donation: $${total}`;
+}
+
+module.exports = { validateDonation };
